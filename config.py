@@ -45,6 +45,9 @@ class AudioConfig:
         """Return the fully resolved file path for the recorded audio."""
         return self.output_dir / f"{self.output_filename}.{self.output_extension}"
 
+    def file_path_with_suffix(self, suffix: str) -> Path:
+        """Return output file path with a suffix added to the file name."""
+        return self.output_dir / f"{self.output_filename}{suffix}.{self.output_extension}"
 
 @dataclass(frozen=True)
 class PlotConfig:
@@ -67,6 +70,22 @@ class PlotConfig:
         stem = Path(audio_filename).stem
         return self.figures_dir / f"{stem}.png"
 
+@dataclass(frozen=True)
+class ProcessingConfig:
+    """Configuration for threshold-based trimming.
+
+    Attributes:
+        threshold: Amplitude threshold in range (0, 1).
+        suffix: Suffix added to the name of processed files.
+    """
+
+    threshold: float = 0.01
+    suffix: str = "_processed"
+
+    def __post_init__(self) -> None:
+        if not 0 < self.threshold < 1:
+            raise ValueError(f"Threshold must be in range (0, 1), got {self.threshold}")
+
 
 @dataclass(frozen=True)
 class AppConfig:
@@ -74,3 +93,4 @@ class AppConfig:
 
     audio: AudioConfig
     plot: PlotConfig
+    processing: ProcessingConfig = field(default_factory=ProcessingConfig)

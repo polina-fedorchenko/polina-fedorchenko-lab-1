@@ -2,8 +2,7 @@
 
 import argparse
 from pathlib import Path
-from config import AppConfig, AudioConfig, PlotConfig
-
+from config import AppConfig, AudioConfig, PlotConfig, ProcessingConfig
 
 def parse_args(args: None | list[str] = None) -> AppConfig:
     """Parse command line arguments and return a validated AppConfig instance.
@@ -16,6 +15,7 @@ def parse_args(args: None | list[str] = None) -> AppConfig:
     """
     default_audio = AudioConfig()
     default_plot = PlotConfig()
+    default_processing = ProcessingConfig()
 
     parser = argparse.ArgumentParser(
         prog="audio-recorder",
@@ -90,6 +90,16 @@ def parse_args(args: None | list[str] = None) -> AppConfig:
         help="Disable interactive GUI window display of the plot",
     )
 
+    # Processing options
+    proc_group = parser.add_argument_group("Processing Settings")
+    proc_group.add_argument(
+        "-t",
+        "--threshold",
+        type=float,
+        default=default_processing.threshold,
+        help="Amplitude threshold (0-1) for trimming silence",
+    )
+
     parsed = parser.parse_args(args)
 
     audio_config = AudioConfig(
@@ -106,4 +116,6 @@ def parse_args(args: None | list[str] = None) -> AppConfig:
         show=parsed.plot_show,
     )
 
-    return AppConfig(audio=audio_config, plot=plot_config)
+    processing_config = ProcessingConfig(threshold=parsed.threshold)
+
+    return AppConfig(audio=audio_config, plot=plot_config, processing=processing_config)

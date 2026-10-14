@@ -69,19 +69,16 @@ class AudioEngine:
             logger.error("Unexpected error during audio recording: %s", err)
             raise AudioRecordingError(f"Unexpected error during recording: {err}") from err
 
-    def save(self, audio_data: np.ndarray) -> Path:
+    def save(self, audio_data: np.ndarray, target_path: Path | None = None) -> Path:
         """Save recorded NumPy audio buffer to a WAV file.
-
         Args:
             audio_data: Numpy array containing audio sample data.
-
         Returns:
             Path: The resolved absolute file path where audio was written.
-
         Raises:
             AudioSaveError: If saving the WAV file to disk fails.
         """
-        target_path = self.config.file_path
+        target_path = target_path or self.config.file_path
 
         try:
             # Ensure target directory exists
